@@ -41,10 +41,25 @@ app.post('/api/users', async (req, res) => {
   }
 })
 
+app.post('/api/users/:_id/exercises', async(req,res) => {
+  try {
+  console.log("_id: " + req.params._id);
+  console.log("body.description: " + req.body.description);
+  console.log("body.duration: " + req.body.duration);
+  console.log("body.date: " + req.body.date);
+  const date = req.body.date ? req.body.date : Date.now()
+  console.log("date: " + date)
+  res.json({username:"",description:req.body.description,duration:req.body.duration,date:date,_id:req.body._id})
+  } catch(error) {
+    console.log(error)
+    res.status(500).json({ error: 'Failed to create exercise' })
+  }
+})
+
 app.get('/api/users', async (req, res) => {
   try {
     const allUsers = await User.find({})
-    console.log('all users: ' + allUsers)
+    //console.log('all users: ' + allUsers)
     res.send(allUsers)
   } catch (error) {
     console.log(error)

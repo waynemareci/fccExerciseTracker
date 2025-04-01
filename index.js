@@ -10,7 +10,9 @@ const req = require('express/lib/request')
 const Schema = mongoose.Schema
 
 const userSchema = new Schema({
-  username: { type: String, required: true }
+  username: { type: String, required: true },
+  count: Number,
+  log: [{ description: String, duration: Number, date: String }]
 })
 
 const User = mongoose.model('User', userSchema)
@@ -41,16 +43,29 @@ app.post('/api/users', async (req, res) => {
   }
 })
 
-app.post('/api/users/:_id/exercises', async(req,res) => {
+app.post('/api/users/:_id/exercises', async (req, res) => {
   try {
-  console.log("_id: " + req.params._id);
-  console.log("body.description: " + req.body.description);
-  console.log("body.duration: " + req.body.duration);
-  console.log("body.date: " + req.body.date);
-  const date = req.body.date ? req.body.date : Date.now()
-  console.log("date: " + date)
-  res.json({username:"",description:req.body.description,duration:req.body.duration,date:date,_id:req.body._id})
-  } catch(error) {
+    console.log('_id: ' + req.params._id)
+    console.log('body.description: ' + req.body.description)
+    console.log('body.duration: ' + req.body.duration)
+    console.log('body.date: ' + req.body.date)
+    const date = req.body.date
+      ? new Date(req.body.date).toString() === 'Invalid Date'
+        ? res.json({ error: 'Invalid Date' })
+        : new Date(req.body.date)
+      : new Date(Date.now())
+    console.log('date: ' + date)
+    const formattedDate = date.toDateString()
+    console.log('formattedDate: ' + formattedDate)
+    const foundUser = await User.findById(req.params._id)
+    res.json({
+      username: foundUser.username,
+      description: req.body.description,
+      duration: req.body.duration,
+      date: formattedDate,
+      _id: req.params._id
+    })
+  } catch (error) {
     console.log(error)
     res.status(500).json({ error: 'Failed to create exercise' })
   }

@@ -11,7 +11,7 @@ const Schema = mongoose.Schema
 
 const userSchema = new Schema({
   username: { type: String, required: true },
-  count: Number,
+  count: { type: Number, default: 0 },
   log: [{ description: String, duration: Number, date: String }]
 })
 
@@ -57,9 +57,10 @@ app.post('/api/users/:_id/exercises', async (req, res) => {
     console.log('date: ' + date)
     const formattedDate = date.toDateString()
     console.log('formattedDate: ' + formattedDate)
-    const foundUser = await User.findById(req.params._id)
+    const foundUser = await User.findById(req.params._id);
     const update = {$push: {"log": {"description": req.body.description,"duration":req.body.duration,"date":formattedDate}}}
     const updatedEntry = await User.findOneAndUpdate({_id:req.params._id},update,{new: true})
+    await User.findOneAndUpdate({_id:req.params._id},{"count":updatedEntry.count+1})
     res.json({
       username: updatedEntry.username,
       description: updatedEntry.log[updatedEntry.log.length-1].description,
@@ -71,6 +72,11 @@ app.post('/api/users/:_id/exercises', async (req, res) => {
     console.log(error)
     res.status(500).json({ error: 'Failed to create exercise' })
   }
+})
+
+app.get('/api/users/:_id/logs', async(req,res) => {
+  const foundUser = await User.findById(req.params._id)
+  res.json({count:foundUser.count,log:foundUser.log}) 
 })
 
 app.get('/api/users', async (req, res) => {

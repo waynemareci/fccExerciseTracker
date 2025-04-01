@@ -76,6 +76,14 @@ app.post('/api/users/:_id/exercises', async (req, res) => {
 
 app.get('/api/users/:_id/logs', async(req,res) => {
   const foundUser = await User.findById(req.params._id)
+  const { from, to, limit } = req.query;
+  let filter = { username: foundUser.username };
+
+  if (from) filter.date = { $gte: new Date(from) };
+  if (to) filter.date = { ...filter.date, $lte: new Date(to) };
+
+  
+
   res.json({count:foundUser.count,log:foundUser.log}) 
 })
 

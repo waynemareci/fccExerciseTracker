@@ -58,11 +58,13 @@ app.post('/api/users/:_id/exercises', async (req, res) => {
     const formattedDate = date.toDateString()
     console.log('formattedDate: ' + formattedDate)
     const foundUser = await User.findById(req.params._id)
+    const update = {$push: {"log": {"description": req.body.description,"duration":req.body.duration,"date":formattedDate}}}
+    const updatedEntry = await User.findOneAndUpdate({_id:req.params._id},update,{new: true})
     res.json({
-      username: foundUser.username,
-      description: req.body.description,
-      duration: req.body.duration,
-      date: formattedDate,
+      username: updatedEntry.username,
+      description: updatedEntry.log[updatedEntry.log.length-1].description,
+      duration: updatedEntry.log[updatedEntry.log.length-1].duration,
+      date: updatedEntry.log[updatedEntry.log.length-1].date,
       _id: req.params._id
     })
   } catch (error) {

@@ -45,6 +45,7 @@ app.get('/api/users', async (req, res) => {
   try {
     const allUsers = await User.find({})
     console.log('all users: ' + allUsers)
+    res.send(allUsers)
   } catch (error) {
     console.log(error)
   }

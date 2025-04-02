@@ -81,10 +81,12 @@ app.get('/api/users/:_id/logs', async(req,res) => {
 
   if (from) filter.date = { $gte: new Date(from) };
   if (to) filter.date = { ...filter.date, $lte: new Date(to) };
+  if (limit) filter.limit = limit;
 
-  
-
-  res.json({count:foundUser.count,log:foundUser.log}) 
+  console.log("from: " + from + "; to: " + to + "; limit: " + limit)
+  console.log("foundUser.log: " + foundUser.log)
+  const limitedLog = foundUser.log.slice(0,limit)
+  res.json({count:foundUser.count,log:limitedLog}) 
 })
 
 app.get('/api/users', async (req, res) => {
